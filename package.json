@@ -1,0 +1,25 @@
+{
+  "name": "mkdata-intellisense",
+  "displayName": "MkData Intellisense",
+  "description": "Syntax highlighting and autocomplete for MkData Generator Scripts.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.98.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "mkdata",
+      "aliases": ["MkData Generator Script", "mkdata"],
+      "extensions": [".gen",".mkd",".mkdata"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "mkdata",
+      "scopeName": "source.mkdata",
+      "path": "./syntaxes/mkdata.tmLanguage.json"
+    }]
+  }
+}
