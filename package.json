@@ -9,17 +9,38 @@
   "categories": [
     "Programming Languages"
   ],
+  "main": "./out/extension.js",
   "contributes": {
-    "languages": [{
-      "id": "mkdata",
-      "aliases": ["MkData Generator Script", "mkdata"],
-      "extensions": [".gen",".mkd",".mkdata"],
-      "configuration": "./language-configuration.json"
-    }],
-    "grammars": [{
-      "language": "mkdata",
-      "scopeName": "source.mkdata",
-      "path": "./syntaxes/mkdata.tmLanguage.json"
-    }]
+    "languages": [
+      {
+        "id": "mkdata",
+        "aliases": [
+          "MkData Generator Script",
+          "mkdata"
+        ],
+        "extensions": [
+          ".gen",
+          ".mkd",
+          ".mkdata"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "mkdata",
+        "scopeName": "source.mkdata",
+        "path": "./syntaxes/mkdata.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.python": "python",
+          "source.python": "python"
+        }
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "@types/vscode": "^1.98.0",
+    "typescript": "^5.8.2"
   }
 }
