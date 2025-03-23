@@ -1,32 +1,80 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "MkData Generator Script",
+	"scopeName": "source.mkdata",
 	"patterns": [
 		{
-			"include": "#keywords"
-		},
-		{
-			"include": "#strings"
+			"include": "#out_scope"
 		}
 	],
 	"repository": {
-		"keywords": {
-			"patterns": [{
-				"name": "keyword.control.mkdata",
-				"match": "\\b(if|while|for|return)\\b"
-			}]
-		},
-		"strings": {
-			"name": "string.quoted.double.mkdata",
-			"begin": "\"",
-			"end": "\"",
+		"out_scope": {
 			"patterns": [
 				{
-					"name": "constant.character.escape.mkdata",
-					"match": "\\\\."
+					"name": "keyword.control.mkdata",
+					"match": "(@redirect)\\s+(stdin|stderr)\\s*$",
+					"captures": {
+						"1": {
+							"name": "keyword.control.mkdata"
+						},
+						"2": {
+							"name": "variable.language.mkdata"
+						}
+					}
+				},
+				{
+					"name": "mkdata.derivative",
+					"begin": "(@redirect)\\s+",
+					"end": "$",
+					"beginCaptures": {
+						"1": {
+							"name": "keyword.control.mkdata"
+						}
+					},
+					"contentName": "meta.embedded.block.python",
+					"patterns": [
+						{
+							"include": "source.python"
+						}
+					]
+				},
+				{
+					"name": "meta.run.block.mkdata",
+					"begin": "@run",
+					"end": "}",
+					"beginCaptures": {
+						"0": {
+							"name": "keyword.control.mkdata"
+						}
+					},
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.block.end.mkdata"
+						}
+					},
+					"patterns": [
+						{
+							"include": "#execution_scope"
+						}
+					]
+				},
+				{
+					"name": "invalid.illegal.mkdata",
+					"match": "@\\w+"
+				},
+				{
+					"name": "comment.block.mkdata",
+					"match": ".+"
+				}
+			]
+		},
+		"execution_scope": {
+			"patterns": [
+				{
+					"match": ".+",
+					"name": "keyword.control.mkdata"
 				}
 			]
 		}
-	},
-	"scopeName": "source.mkdata"
+	}
 }
