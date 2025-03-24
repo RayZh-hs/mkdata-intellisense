@@ -33,6 +33,29 @@
 			"name": "comment.block.mkdata",
 			"match": "#(?=(?:[^\"']*[\"'][^\"']*[\"'])*[^\"']*$).*$"
 		},
+		"mkdata_sentence": {
+			"name": "meta.sentence.mkdata",
+			"match": "^ *(?=[^ \\n])(%?\\w+:)? *([^@\\n }]\\N*?)? *(\\\\(?:n|s)?)? *(#\\N*)?$",
+			"captures": {
+				"1": {
+					"name": "entity.name.tag.mkdata"
+				},
+				"2": {
+					"name": "meta.embedded.block.python",
+					"patterns": [
+						{
+							"include": "source.python"
+						}
+					]
+				},
+				"3": {
+					"name": "constant.character.escape.mkdata"
+				},
+				"4": {
+					"name": "comment.line.mkdata"
+				}
+			}
+		},
 		"mkdata_redirect_builtin": {
 			"name": "keyword.control.mkdata",
 			"match": "(@redirect)\\s+(stdout|stderr)\\b",
@@ -211,6 +234,9 @@
 				},
 				{
 					"include": "#mkdata_any_block"
+				},
+				{
+					"include": "#mkdata_sentence"
 				}
 			]
 		}
