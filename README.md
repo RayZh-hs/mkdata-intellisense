@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/RayZh-hs/mkdata-intellisense/main/img/logo.png" alt="mkdata-logo" width="180">
+</div>
+
 # MkData Intellisense
 
 The MkData Intellisense extension provides intellisense for the MkData Generator Script language.
