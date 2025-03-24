@@ -2,7 +2,12 @@
   "name": "mkdata-intellisense",
   "displayName": "MkData Intellisense",
   "description": "Syntax highlighting and autocomplete for MkData Generator Scripts.",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RayZh-hs/mkdata.git"
+  },
+  "icon": "img/logo.png",
   "engines": {
     "vscode": "^1.98.0"
   },
@@ -23,7 +28,11 @@
           ".mkd",
           ".mkdata"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./img/logo.png",
+          "dark": "./img/logo.png"
+        }
       }
     ],
     "grammars": [

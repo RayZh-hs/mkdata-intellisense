@@ -1,5 +1,6 @@
 node_modules
 *.vsix
 out
+local-tests
 
 syntaxes/*.test.json
