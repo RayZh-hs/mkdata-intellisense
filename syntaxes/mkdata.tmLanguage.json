@@ -136,8 +136,73 @@
 				}
 			]
 		},
+		"mkdata_for_block": {
+			"name": "meta.for.block.mkdata",
+			"begin": "(@for)\\s*([^{]*)\\{?",
+			"end": "\\}",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.mkdata"
+				},
+				"2": {
+					"name": "meta.embedded.block.python",
+					"patterns": [
+						{
+							"include": "source.python"
+						}
+					]
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.end.mkdata"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#execution_scope"
+				},
+				{
+					"include": "#mkdata_comment"
+				}
+			]
+		},
+		"mkdata_any_block": {
+			"begin": "(?:^[ \\t]*(?:(?=@any)(@any)(.*)|})? *)?\\{",
+			"end": "^ *}",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.mkdata"
+				},
+				"2": {
+					"name": "meta.embedded.block.python",
+					"patterns": [
+						{
+							"include": "source.python"
+						}
+					]
+				}
+			},
+			"patterns": [
+				{
+					"include": "#execution_scope"
+				}
+			]
+		},
 		"execution_scope": {
 			"patterns": [
+				{
+					"include": "#mkdata_comment"
+				},
+				{
+					"include": "#mkdata_python_block"
+				},
+				{
+					"include": "#mkdata_loop_block"
+				},
+				{
+					"include": "#mkdata_for_block"
+				},
 				{
 					"include": "#mkdata_redirect_builtin"
 				},
@@ -145,10 +210,7 @@
 					"include": "#mkdata_redirect_expr"
 				},
 				{
-					"include": "#mkdata_python_block"
-				},
-				{
-					"include": "#mkdata_loop_block"
+					"include": "#mkdata_any_block"
 				}
 			]
 		}
