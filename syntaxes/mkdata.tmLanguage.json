@@ -11,52 +11,13 @@
 		"out_scope": {
 			"patterns": [
 				{
-					"name": "keyword.control.mkdata",
-					"match": "(@redirect)\\s+(stdin|stderr)\\s*$",
-					"captures": {
-						"1": {
-							"name": "keyword.control.mkdata"
-						},
-						"2": {
-							"name": "variable.language.mkdata"
-						}
-					}
+					"include": "#mkdata_redirect_builtin"
 				},
 				{
-					"name": "mkdata.derivative",
-					"begin": "(@redirect)\\s+",
-					"end": "$",
-					"beginCaptures": {
-						"1": {
-							"name": "keyword.control.mkdata"
-						}
-					},
-					"contentName": "meta.embedded.block.python",
-					"patterns": [
-						{
-							"include": "source.python"
-						}
-					]
+					"include": "#mkdata_redirect_expr"
 				},
 				{
-					"name": "meta.run.block.mkdata",
-					"begin": "@run",
-					"end": "}",
-					"beginCaptures": {
-						"0": {
-							"name": "keyword.control.mkdata"
-						}
-					},
-					"endCaptures": {
-						"0": {
-							"name": "punctuation.definition.block.end.mkdata"
-						}
-					},
-					"patterns": [
-						{
-							"include": "#execution_scope"
-						}
-					]
+					"include": "#mkdata_run_block"
 				},
 				{
 					"name": "invalid.illegal.mkdata",
@@ -68,11 +29,126 @@
 				}
 			]
 		},
+		"mkdata_comment": {
+			"name": "comment.block.mkdata",
+			"match": "#(?=(?:[^\"']*[\"'][^\"']*[\"'])*[^\"']*$).*$"
+		},
+		"mkdata_redirect_builtin": {
+			"name": "keyword.control.mkdata",
+			"match": "(@redirect)\\s+(stdout|stderr)\\b",
+			"captures": {
+				"1": {
+					"name": "keyword.control.mkdata"
+				},
+				"2": {
+					"name": "support.type.builtin.mkdata"
+				}
+			}
+		},
+		"mkdata_redirect_expr": {
+			"name": "mkdata.derivative",
+			"begin": "(@redirect)\\s+",
+			"end": "$",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.mkdata"
+				}
+			},
+			"contentName": "meta.embedded.block.python",
+			"patterns": [
+				{
+					"include": "source.python"
+				}
+			]
+		},
+		"mkdata_run_block": {
+			"name": "meta.run.block.mkdata",
+			"begin": "(@run)\\s*\\{?",
+			"end": "\\}",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.mkdata"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.end.mkdata"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#execution_scope"
+				},
+				{
+					"include": "#mkdata_comment"
+				}
+			]
+		},
+		"mkdata_python_block": {
+			"name": "meta.python.block.mkdata",
+			"begin": "(@python)\\s*\\{",
+			"end": "\\}",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.mkdata"
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.end.mkdata"
+				}
+			},
+			"contentName": "meta.embedded.block.python",
+			"patterns": [
+				{
+					"include": "source.python"
+				}
+			]
+		},
+		"mkdata_loop_block": {
+			"name": "meta.loop.block.mkdata",
+			"begin": "(@loop)\\s*([^{]*)\\{?",
+			"end": "\\}",
+			"beginCaptures": {
+				"1": {
+					"name": "keyword.control.mkdata"
+				},
+				"2": {
+					"name": "meta.embedded.block.python",
+					"patterns": [
+						{
+							"include": "source.python"
+						}
+					]
+				}
+			},
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.block.end.mkdata"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#execution_scope"
+				},
+				{
+					"include": "#mkdata_comment"
+				}
+			]
+		},
 		"execution_scope": {
 			"patterns": [
 				{
-					"match": ".+",
-					"name": "keyword.control.mkdata"
+					"include": "#mkdata_redirect_builtin"
+				},
+				{
+					"include": "#mkdata_redirect_expr"
+				},
+				{
+					"include": "#mkdata_python_block"
+				},
+				{
+					"include": "#mkdata_loop_block"
 				}
 			]
 		}
