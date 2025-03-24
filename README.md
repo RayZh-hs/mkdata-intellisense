@@ -9,7 +9,6 @@ The MkData Intellisense extension provides intellisense for the MkData Generator
 🚧 Autocomplete features (work in progress);
 
 
-
 ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
@@ -30,6 +29,9 @@ Some of these are problems inherit to the way vscode uses regex to parse the lan
 
 ## Release Notes
 
-### 1.0.0
+Only changes that are reflected in the minor version section are listed here. For a full list of changes, please refer to the [changelog](CHANGELOG.md).
 
-Initial release of MkData Intellisense.
+### 1.0.x
+
+Private release of MkData Intellisense.
+

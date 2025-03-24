@@ -2,8 +2,23 @@
 
 All notable changes to the "mkdata-intellisense" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.0.0] - 2025-03-24 (private release)
 
-## [Unreleased]
+Private release of MkData Intellisense for Visual Studio Code.
 
-- Initial release
+### Added
+
+- Syntax highlighting for .gen, .mkd and .mkdata files;
+- Preliminary error checking for mkdata scripts;
+
+## [1.0.1] - 2025-03-25
+
+Minor styling changes.
+
+### Added
+
+- Created CHANGELOG.md;
+
+### Changed
+
+- Reformat assigned variables so that they normally do not collide in color with keywords;
