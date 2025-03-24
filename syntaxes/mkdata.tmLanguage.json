@@ -38,7 +38,7 @@
 			"match": "^ *(?=[^ \\n])(%?\\w+:)? *([^@\\n }]\\N*?)? *(\\\\(?:n|s)?)? *(#\\N*)?$",
 			"captures": {
 				"1": {
-					"name": "entity.name.tag.mkdata"
+					"name": "variable.other.mkdata"
 				},
 				"2": {
 					"name": "meta.embedded.block.python",
