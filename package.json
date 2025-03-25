@@ -2,7 +2,7 @@
   "name": "mkdata-intellisense",
   "displayName": "MkData Intellisense",
   "description": "Syntax highlighting and autocomplete for MkData Generator Scripts.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/RayZh-hs/mkdata.git"
