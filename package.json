@@ -5,7 +5,7 @@
   "version": "1.0.2",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RayZh-hs/mkdata.git"
+    "url": "https://github.com/RayZh-hs/mkdata-intellisense.git"
   },
   "icon": "img/logo.png",
   "engines": {
@@ -45,11 +45,22 @@
           "source.python": "python"
         }
       }
+    ],
+    "commands": [
+      {
+        "command": "extension.checkLanguage",
+        "title": "Check Active Document Language"
+      }
     ]
   },
   "devDependencies": {
     "@types/node": "^22.13.11",
     "@types/vscode": "^1.98.0",
     "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
   }
 }
