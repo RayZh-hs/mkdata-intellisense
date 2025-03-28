@@ -37,3 +37,9 @@ Minor styling fix.
 
 - Diagnosis capacity for mkdata scripts;
 - Settings for user-side customization of the extension;
+
+## [1.1.1] - 2025-03-28
+
+### Fixed
+
+- A bug where # in quotation marks within a sentence is mistaken as leading a comment;
