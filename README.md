@@ -35,3 +35,6 @@ Only changes that are reflected in the minor version section are listed here. Fo
 
 Private release of MkData Intellisense.
 
+### 1.1.x
+
+Added diagnosis capacity for mkdata scripts and customizable settings.

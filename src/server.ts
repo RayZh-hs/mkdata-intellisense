@@ -9,12 +9,20 @@ import {
     Position
 } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import * as lsp from 'vscode-languageserver-types';
+
 import { assert } from "console";
-import { findIndexStartingAt, getIndentation } from "./_utils";
+import * as utils from "./_utils";
+
+interface MkDataSettings {
+    enableAutoComplete: boolean;
+    diagnosisMode: string;
+};
 
 const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
 const cursorPositions = new Map<string, Position>();
+let extensionConfig: MkDataSettings | undefined;
 
 enum scopeType {
     Out = "out",
@@ -39,7 +47,15 @@ connection.onRequest('updateCursorPosition', (params: { uri: string; position: P
     cursorPositions.set(params.uri, params.position);
 });
 
+connection.onRequest('updateConfiguration', (params: { newSettings: MkDataSettings }) => {
+    console.log("Settings updated to", params.newSettings);
+    extensionConfig = params.newSettings;
+});
+
 connection.onCompletion((_textDocumentPosition) => {
+    if (!extensionConfig?.enableAutoComplete) {
+        return null;
+    }
     console.log("Completion requested at position", _textDocumentPosition.position);
     const document_literal = documents.get(_textDocumentPosition.textDocument.uri)?.getText();
     if (!document_literal) {
@@ -104,6 +120,9 @@ documents.onDidChangeContent((change) => {
         console.debug("Language ID of the active document is not mkdata");
         return;
     }
+    if (!extensionConfig || extensionConfig.diagnosisMode === 'Disabled') {
+        return null;
+    }
     const document_literal = change.document.getText();
     const uri = change.document.uri;
 
@@ -116,6 +135,10 @@ documents.onDidChangeContent((change) => {
         console.error("No cursor position found for", uri);
         return;
     }
+
+    // Change the diagnosis for the document
+    const diagnostics = buildDiagnosticsForDocument(document_literal);
+    connection.sendDiagnostics({ uri, diagnostics });
 })
 
 function getCurrentScope(document_literal: string, cursor_pos: Position): scopeType {
@@ -123,7 +146,7 @@ function getCurrentScope(document_literal: string, cursor_pos: Position): scopeT
     // identify whether the position is in the execution zone
     assert(cursor_pos.line < document_lines.length, "Cursor position out of range");
     const run_start = document_lines.findIndex((line) => line.startsWith("@run"));
-    const run_end = findIndexStartingAt((line) => line.startsWith("}"), document_lines, run_start);
+    const run_end = utils.findIndexStartingAt((line) => line.startsWith("}"), document_lines, run_start);
     console.log({ run_start, run_end, cursor_pos });
     if (!run_start || !run_end || !(
         run_start <= cursor_pos.line && cursor_pos.line <= run_end
@@ -134,7 +157,7 @@ function getCurrentScope(document_literal: string, cursor_pos: Position): scopeT
     // identify the type of execution zone
     const cur_line = document_lines[cursor_pos.line].substring(0, cursor_pos.character);
     for (let i = cursor_pos.line - 1; i >= run_start; i--) {
-        if (document_lines[i].trimStart().startsWith("@python") && getIndentation(document_lines[i]) < getIndentation(cur_line)) {
+        if (document_lines[i].trimStart().startsWith("@python") && utils.getIndentation(document_lines[i]) < utils.getIndentation(cur_line)) {
             return scopeType.Python;
         }
         else if (document_lines[i].trimStart().startsWith("@")) {
@@ -151,6 +174,92 @@ function getCurrentScope(document_literal: string, cursor_pos: Position): scopeT
         return scopeType.MkData;
     }
     return scopeType.Python;
+}
+
+function buildDiagnosticsForDocument(document_literal: string): lsp.Diagnostic[] {
+    const document_lines = document_literal.split('\n');
+    let diagnosticCollection: lsp.Diagnostic[] = [];
+
+    if (extensionConfig?.diagnosisMode === 'Standard Mode') {
+        diagnosticCollection = diagnosticCollection
+            .concat(utils.buildDiagnosticsWithRegex(
+                document_literal,
+                /^@(?!redirect\b|run\b)/gm,
+                'Only @redirect and @run can be used outside the execution scope.',
+            ))
+            .concat(utils.buildDiagnosticsWithRegex(
+                document_literal,
+                /\s*@(?!redirect\b|run\b|python\b|loop\b|for\b|any\b)(\w*)/gm,
+                match => `Unknown syntax "@${match[1].trim()}".`,
+                1
+            ))
+            .concat(utils.buildDiagnosticsWithRegex(
+                document_literal,
+                /^@run *([^#{ ][^\r\n]+)/gm,
+                'Unexpected parameters after @run.',
+                1
+            ))
+            .concat(utils.buildDiagnosticsWithRegex(
+                document_literal,
+                /^[ \t]+@run/gm,
+                'Unexpected indentation before @run.',
+            ))
+            .concat(utils.buildDiagnosticsWithRegex(
+                document_literal,
+                /^[ \t]*@loop([ \t]*)(?:\{|#|\n|\r)/gm,
+                'Expected expression: `times` after @loop.',
+            ))
+            .concat(utils.buildDiagnosisAdvanced(
+                document_lines,
+                /^@run/gm,
+                (() => {
+                    let runAppearanceTimes = 0;
+                    return (curLine, pos) => {
+                        console.log({ runAppearanceTimes });
+                        console.log({ curLine, pos });
+                        if (runAppearanceTimes == 0) {
+                            runAppearanceTimes += 1;
+                            return null;
+                        }
+                        runAppearanceTimes += 1;
+                        return {
+                            message: "Duplicate @run block. Only the first one will be interpreted.",
+                            severity: lsp.DiagnosticSeverity.Warning
+                        }
+                    }
+                })()
+            ))
+            .concat(utils.buildDiagnosisAdvanced(
+                document_lines,
+                /^[ \t]+@for/gm,
+                (curLine, pos) => {
+                    if (!curLine.includes('in')) {
+                        return {
+                            message: "Expected keyword 'in' in @for.",
+                        }
+                    }
+                    const var_name = curLine.substring(curLine.indexOf('@for') + 4, curLine.indexOf('in')).trim();
+                    if (!var_name.match(/\w+/)) {
+                        return {
+                            message: "Variable names must only contain letters, numbers and underscores.",
+                        }
+                    }
+                    return null;
+                }
+            ))
+    }
+    if (extensionConfig?.diagnosisMode === 'Strict Mode') {
+        diagnosticCollection = diagnosticCollection
+            .concat(utils.buildDiagnosticsWithRegex(
+                document_literal,
+                /\t/gm,
+                'Tabs are not recommended. Use spaces instead.',
+                0,
+                lsp.DiagnosticSeverity.Warning
+            ))
+    }
+
+    return diagnosticCollection;
 }
 
 documents.listen(connection);

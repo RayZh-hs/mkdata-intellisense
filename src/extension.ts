@@ -52,6 +52,26 @@ export function activate(context: vscode.ExtensionContext) {
         });
     });
 
+    const getConfiguration = () => {
+        let settings = vscode.workspace.getConfiguration('mkdataIntellisense');
+        return {
+            enableAutoComplete: settings.get<boolean>('enableAutoComplete'),
+            diagnosisMode: settings.get<string>('diagnosisMode'),
+        };
+    }
+    vscode.workspace.onDidChangeConfiguration((event) => {
+        if (event.affectsConfiguration('mkdataIntellisense')) {
+            console.log("Configuration changed");
+            client.sendRequest("updateConfiguration", {
+                newSettings: getConfiguration()
+            });
+        }
+    })
+    // and also send the initial configuration
+    client.sendRequest("updateConfiguration", {
+        newSettings: getConfiguration()
+    });
+
     context.subscriptions.push(
         commandCheckExtension,
     );

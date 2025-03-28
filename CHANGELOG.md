@@ -30,3 +30,10 @@ Minor styling fix.
 ### Fixed
 
 - Fixed a bug where the color of single-escape lines was not being applied correctly;
+
+## [1.1.0] - 2025-03-28
+
+### Added
+
+- Diagnosis capacity for mkdata scripts;
+- Settings for user-side customization of the extension;
