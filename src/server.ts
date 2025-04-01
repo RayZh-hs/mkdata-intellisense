@@ -148,7 +148,7 @@ function getCurrentScope(document_literal: string, cursor_pos: Position): scopeT
     const run_start = document_lines.findIndex((line) => line.startsWith("@run"));
     const run_end = utils.findIndexStartingAt((line) => line.startsWith("}"), document_lines, run_start);
     console.log({ run_start, run_end, cursor_pos });
-    if (!run_start || !run_end || !(
+    if (run_start == -1 || run_end == -1 || !(
         run_start <= cursor_pos.line && cursor_pos.line <= run_end
     )) {
         return scopeType.Out;

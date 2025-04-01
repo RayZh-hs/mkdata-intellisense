@@ -121,7 +121,7 @@
 		},
 		"mkdata_python_block": {
 			"name": "meta.python.block.mkdata",
-			"begin": "(@python)\\s*\\{",
+			"begin": "(@python)\\s*\\{?",
 			"end": "\\}",
 			"beginCaptures": {
 				"1": {

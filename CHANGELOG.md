@@ -43,3 +43,10 @@ Minor styling fix.
 ### Fixed
 
 - A bug where # in quotation marks within a sentence is mistaken as leading a comment;
+
+## [1.1.2] - 2025-04-01
+
+### Fixed
+
+- Wrong scope detection within the execution zone;
+- Make syntax highlighting for registered keywords more consistent regarding trailing braces;

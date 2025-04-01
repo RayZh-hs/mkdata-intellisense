@@ -26,6 +26,7 @@ Some of these are problems inherit to the way vscode uses regex to parse the lan
 
 - Syntax highlighting breaks when syntax lines utilize python expressions including the { character.
 - Unpaired quotation marks in comments will lead to false commenting in that line.
+- Syntax `@any` requires the bracket { to be on the same line, and will not be highlighted until the bracket has been opened.
 
 ## Release Notes
 
