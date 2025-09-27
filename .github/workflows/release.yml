@@ -98,8 +98,24 @@ jobs:
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git tag v${{ steps.package.outputs.version }}
-        git push origin v${{ steps.package.outputs.version }}
+        
+        TAG_NAME="v${{ steps.package.outputs.version }}"
+        
+        # Check if tag already exists locally
+        if git tag -l | grep -q "^${TAG_NAME}$"; then
+          echo "Tag $TAG_NAME already exists locally, deleting it first"
+          git tag -d $TAG_NAME
+        fi
+        
+        # Check if tag exists on remote
+        if git ls-remote --tags origin | grep -q "refs/tags/${TAG_NAME}$"; then
+          echo "Tag $TAG_NAME already exists on remote, deleting it first"
+          git push --delete origin $TAG_NAME
+        fi
+        
+        # Create and push the new tag
+        git tag $TAG_NAME
+        git push origin $TAG_NAME
         
     - name: Create GitHub Release
       if: steps.version-check.outputs.should-release == 'true'
