@@ -2,13 +2,15 @@ name: Release and Publish Extension
 
 on:
   push:
-    tags:
-      - 'v*'  # Trigger on version tags like v1.0.0, v1.1.3, etc.
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout code
@@ -90,11 +92,19 @@ jobs:
         echo "Current version: ${{ steps.package.outputs.version }}"
         echo "Extension: ${{ steps.package.outputs.publisher }}.${{ steps.package.outputs.name }}"
         
+    - name: Create Git Tag
+      if: steps.version-check.outputs.should-release == 'true'
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git tag v${{ steps.package.outputs.version }}
+        git push origin v${{ steps.package.outputs.version }}
+        
     - name: Create GitHub Release
       if: steps.version-check.outputs.should-release == 'true'
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref_name }}
+        tag_name: v${{ steps.package.outputs.version }}
         name: ${{ steps.package.outputs.displayname }} v${{ steps.package.outputs.version }}
         draft: false
         prerelease: false
