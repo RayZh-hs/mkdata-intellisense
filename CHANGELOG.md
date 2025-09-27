@@ -56,3 +56,10 @@ Minor styling fix.
 ### Added
 
 - Packaging support via esbuild;
+
+## [1.1.4] - 2025-09-27
+
+### Changed
+
+- Obsolete README.md contents removed;
+- Setup Github Actions for automatic release on new version tag.

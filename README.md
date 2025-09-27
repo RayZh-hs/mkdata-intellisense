@@ -6,7 +6,7 @@ The MkData Intellisense extension provides intellisense for the MkData Generator
 
 ✅ Syntax highlighting for .gen, .mkd and .mkdata files;  
 ✅ Error checking for mkdata scripts;   
-🚧 Autocomplete features (work in progress);
+✅ Primary autocomplete features;
 
 
 ## Extension Settings
@@ -24,18 +24,10 @@ This extension contributes the following settings:
 
 Some of these are problems inherit to the way vscode uses regex to parse the language. Please consider contributing if you have any ideas on how to fix them.
 
-- Syntax highlighting breaks when syntax lines utilize python expressions including the { character.
-- Unpaired quotation marks in comments will lead to false commenting in that line.
-- Syntax `@any` requires the bracket { to be on the same line, and will not be highlighted until the bracket has been opened.
+- Code blocks must strictly follow the Google code style, i.e. opening brace must be on the same line as the declaration.
 
 ## Release Notes
 
-Only changes that are reflected in the minor version section are listed here. For a full list of changes, please refer to the [changelog](CHANGELOG.md).
+Latest release: 1.1.4 (Sep 27, 2025)
 
-### 1.0.x
-
-Private release of MkData Intellisense.
-
-### 1.1.x
-
-Added diagnosis capacity for mkdata scripts and customizable settings.
+See [CHANGELOG.md](./CHANGELOG.md) for details.

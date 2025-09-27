@@ -17,14 +17,14 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'npm'
         
     - name: Install dependencies
       run: npm ci
       
     - name: Install vsce
-      run: npm install -g @vscode/vsce
+      run: npm install -g @vscode/vsce@^2.22.0
       
     - name: Build extension
       run: npm run build:prod
@@ -38,8 +38,60 @@ jobs:
         echo "name=$(node -p \"require('./package.json').name\")" >> $GITHUB_OUTPUT
         echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
         echo "displayname=$(node -p \"require('./package.json').displayName\")" >> $GITHUB_OUTPUT
+        echo "publisher=$(node -p \"require('./package.json').publisher\")" >> $GITHUB_OUTPUT
+        
+    - name: Check if version exists in marketplace
+      id: version-check
+      run: |
+        PUBLISHER="${{ steps.package.outputs.publisher }}"
+        EXTENSION_NAME="${{ steps.package.outputs.name }}"
+        CURRENT_VERSION="${{ steps.package.outputs.version }}"
+        
+        echo "Checking if version $CURRENT_VERSION exists for $PUBLISHER.$EXTENSION_NAME"
+        
+        # Try to use vsce show command to check if version exists
+        set +e  # Don't exit on error
+        VSCE_OUTPUT=$(vsce show "$PUBLISHER.$EXTENSION_NAME" --json 2>/dev/null)
+        VSCE_EXIT_CODE=$?
+        set -e  # Re-enable exit on error
+        
+        if [ $VSCE_EXIT_CODE -eq 0 ]; then
+          # Extension exists, check if version exists
+          VERSION_EXISTS=$(echo "$VSCE_OUTPUT" | node -e "
+            try {
+              const data = JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'));
+              const versions = data.versions || [];
+              const targetVersion = '$CURRENT_VERSION';
+              const exists = versions.some(v => v.version === targetVersion);
+              console.log(exists ? 'true' : 'false');
+            } catch (e) {
+              console.log('false');
+            }
+          ")
+        else
+          # Extension doesn't exist at all, so version doesn't exist
+          VERSION_EXISTS="false"
+        fi
+        
+        echo "version-exists=$VERSION_EXISTS" >> $GITHUB_OUTPUT
+        
+        if [ "$VERSION_EXISTS" = "true" ]; then
+          echo "⚠️ Version $CURRENT_VERSION already exists in the marketplace"
+          echo "should-release=false" >> $GITHUB_OUTPUT
+        else
+          echo "✅ Version $CURRENT_VERSION does not exist, proceeding with release"
+          echo "should-release=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Skip release (version already exists)
+      if: steps.version-check.outputs.should-release == 'false'
+      run: |
+        echo "::warning::Skipping release - version ${{ steps.package.outputs.version }} already exists in VS Code Marketplace"
+        echo "Current version: ${{ steps.package.outputs.version }}"
+        echo "Extension: ${{ steps.package.outputs.publisher }}.${{ steps.package.outputs.name }}"
         
     - name: Create GitHub Release
+      if: steps.version-check.outputs.should-release == 'true'
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.ref_name }}
@@ -67,6 +119,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Publish to VS Code Marketplace
+      if: steps.version-check.outputs.should-release == 'true'
       run: vsce publish --pat ${{ secrets.VSCE_PAT }}
       env:
         VSCE_PAT: ${{ secrets.VSCE_PAT }}
