@@ -17,7 +17,9 @@
   ],
   "scripts": {
     "build": "node esbuild.js",
-    "build:prod": "node esbuild.js --production"
+    "build:prod": "node esbuild.js --production",
+    "package": "vsce package",
+    "publish": "vsce publish"
   },
   "main": "./out/extension.js",
   "contributes": {
