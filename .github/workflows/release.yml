@@ -9,6 +9,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    environment: vscode-extension-dev
     permissions:
       contents: write
     
