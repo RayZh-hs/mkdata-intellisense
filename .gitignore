@@ -4,3 +4,4 @@ out
 local-tests
 
 syntaxes/*.test.json
+.mango/*

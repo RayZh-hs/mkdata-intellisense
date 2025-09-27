@@ -50,3 +50,9 @@ Minor styling fix.
 
 - Wrong scope detection within the execution zone;
 - Make syntax highlighting for registered keywords more consistent regarding trailing braces;
+
+## [1.1.3] - 2025-09-27
+
+### Added
+
+- Packaging support via esbuild;
